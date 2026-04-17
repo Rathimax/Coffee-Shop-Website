@@ -1,0 +1,120 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+
+:root {
+  --card: #F1F0E5;
+  --ring: #A37764;
+  --input: #BAAB92;
+  --muted: #E4C7B8;
+  --accent: #E4C7B8;
+  --border: #BAAB92;
+  --radius: 0.5rem;
+  --chart-1: #A37764;
+  --chart-2: #8A655A;
+  --chart-3: #C39E88;
+  --chart-4: #BAAB92;
+  --chart-5: #A28777;
+  --popover: #FFFFFF;
+  --primary: #A37764;
+  --sidebar: #ebd6cb;
+  --font-mono: Menlo, monospace;
+  --font-sans: "DM Sans", sans-serif;
+  --font-serif: "Playfair Display", serif;
+  --secondary: #BAAB92;
+  --background: #F1F0E5;
+  --foreground: #56453F;
+  --destructive: #1f1a17;
+  --shadow-blur: 0px;
+  --shadow-color: hsl(20 18% 51% / 0.4);
+  --sidebar-ring: #A37764;
+  --shadow-spread: 0px;
+  --shadow-opacity: 0.11;
+  --sidebar-accent: #C39E88;
+  --sidebar-border: #A28777;
+  --card-foreground: #56453F;
+  --shadow-offset-x: 2px;
+  --shadow-offset-y: 2px;
+  --sidebar-primary: #A37764;
+  --muted-foreground: #8A655A;
+  --accent-foreground: #56453F;
+  --popover-foreground: #56453F;
+  --primary-foreground: #FFFFFF;
+  --sidebar-foreground: #56453F;
+  --secondary-foreground: #ffffff;
+  --destructive-foreground: #FFFFFF;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-primary-foreground: #FFFFFF;
+}
+
+.dark {
+  --card: #3c332e;
+  --ring: #C39E88;
+  --input: #56453F;
+  --muted: #56453F;
+  --accent: #BAAB92;
+  --border: #56453F;
+  --chart-1: #C39E88;
+  --chart-2: #BAAB92;
+  --chart-3: #A37764;
+  --chart-4: #8A655A;
+  --chart-5: #A28777;
+  --popover: #3c332e;
+  --primary: #C39E88;
+  --sidebar: #1f1a17;
+  --secondary: #8A655A;
+  --background: #2d2521;
+  --foreground: #F1F0E5;
+  --destructive: #E57373;
+  --shadow-color: hsl(20 18% 30% / 0.5);
+  --sidebar-ring: #C39E88;
+  --sidebar-accent: #BAAB92;
+  --sidebar-border: #56453F;
+  --card-foreground: #F1F0E5;
+  --sidebar-primary: #C39E88;
+  --muted-foreground: #c5aa9b;
+  --accent-foreground: #2d2521;
+  --popover-foreground: #F1F0E5;
+  --primary-foreground: #2d2521;
+  --sidebar-foreground: #F1F0E5;
+  --secondary-foreground: #F1F0E5;
+  --destructive-foreground: #2d2521;
+  --sidebar-accent-foreground: #1f1a17;
+  --sidebar-primary-foreground: #1f1a17;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--background);
+  color: var(--foreground);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, .font-serif {
+  font-family: var(--font-serif);
+}
+
+img {
+  max-width: 100%;
+}
+
+ul {
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
