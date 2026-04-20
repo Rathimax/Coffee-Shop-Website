@@ -7,7 +7,7 @@ const CoffeeCard = ({ item }) => {
       borderRadius: '24px',
       padding: '24px',
       textAlign: 'left',
-      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+      transition: 'box-shadow 0.3s ease',
       cursor: 'pointer',
       boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
       border: '1px solid rgba(186, 171, 146, 0.2)',

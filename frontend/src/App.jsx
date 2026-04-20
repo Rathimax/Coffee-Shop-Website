@@ -10,11 +10,11 @@ function App() {
       <Navbar />
       <CoffeeHero />
       <MenuSection />
-      
+
       {/* Footer Section */}
-      <footer style={{ 
-        padding: '60px 5%', 
-        background: 'var(--sidebar)', 
+      <footer style={{
+        padding: '60px 5%',
+        background: 'var(--sidebar)',
         color: 'var(--foreground)',
         textAlign: 'center',
         borderTop: '1px solid var(--border)'

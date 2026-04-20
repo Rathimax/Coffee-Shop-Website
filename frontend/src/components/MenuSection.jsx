@@ -54,17 +54,30 @@ const MenuSection = () => {
 
     useEffect(() => {
         if (!loading && menu.length > 0) {
-            gsap.from(gridRef.current.children, {
-                scrollTrigger: {
-                    trigger: gridRef.current,
-                    start: "top 80%",
-                },
-                y: 60,
-                opacity: 0,
-                duration: 1.2,
-                stagger: 0.2,
-                ease: "power3.out"
-            });
+            // Using gsap.context for clean animation management and cleanup
+            const ctx = gsap.context(() => {
+                gsap.fromTo(gridRef.current.children, 
+                    { y: 60, opacity: 0 },
+                    {
+                        scrollTrigger: {
+                            trigger: gridRef.current,
+                            start: "top 85%",
+                            once: true
+                        },
+                        y: 0,
+                        opacity: 1,
+                        duration: 1.2,
+                        stagger: 0.15,
+                        ease: "power3.out",
+                        clearProps: "opacity,transform"
+                    }
+                );
+            }, sectionRef);
+
+            // Force a refresh of all ScrollTriggers once content is definitely in the DOM
+            ScrollTrigger.refresh();
+
+            return () => ctx.revert();
         }
     }, [loading, menu]);
 
