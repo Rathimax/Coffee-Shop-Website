@@ -1,44 +1,41 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 
 const CoffeeHero = () => {
     const heroRef = useRef(null);
     const contentRef = useRef(null);
     const videoRef = useRef(null);
 
-    useLayoutEffect(() => {
-        const ctx = gsap.context(() => {
-            const tl = gsap.timeline();
+    useGSAP(() => {
+        const tl = gsap.timeline();
 
-            tl.from(heroRef.current, {
-                opacity: 0,
-                duration: 1.5,
-                ease: "power2.out"
-            })
-            .fromTo(contentRef.current.children,
-                { y: 50, opacity: 0 },
-                {
-                    y: 0,
-                    opacity: 1,
-                    duration: 1,
-                    stagger: 0.3,
-                    ease: "power3.out"
-                },
-                "-=0.5"
-            );
+        tl.from(heroRef.current, {
+            opacity: 0,
+            duration: 1.5,
+            ease: "power2.out"
+        })
+        .fromTo(contentRef.current.children,
+            { y: 50, opacity: 0 },
+            {
+                y: 0,
+                opacity: 1,
+                duration: 1,
+                stagger: 0.3,
+                ease: "power3.out"
+            },
+            "-=0.5"
+        );
 
-            // Subtle slow zoom for the video background
-            gsap.to(videoRef.current, {
-                scale: 1.1,
-                duration: 20,
-                repeat: -1,
-                yoyo: true,
-                ease: "sine.inOut"
-            });
-        }, heroRef);
-
-        return () => ctx.revert();
-    }, []);
+        // Subtle slow zoom for the video background
+        gsap.to(videoRef.current, {
+            scale: 1.1,
+            duration: 20,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut"
+        });
+    }, { scope: heroRef });
 
     return (
         <section

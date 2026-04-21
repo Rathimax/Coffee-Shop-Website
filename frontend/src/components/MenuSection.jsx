@@ -86,7 +86,7 @@ const MenuSection = () => {
             id="menu"
             ref={sectionRef}
             style={{
-                padding: '100px 5%',
+                padding: '80px 5% 50px',
                 background: 'var(--background)',
                 textAlign: 'center'
             }}

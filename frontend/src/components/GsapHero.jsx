@@ -1,5 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 
 const GsapHero = () => {
     const heroRef = useRef(null);
@@ -7,30 +8,26 @@ const GsapHero = () => {
     const subTextRef = useRef(null);
     const videoRef = useRef(null);
 
-    useEffect(() => {
-        const ctx = gsap.context(() => {
-            // Text entrance animation
-            gsap.from([textRef.current, subTextRef.current], {
-                y: 50,
-                opacity: 0,
-                duration: 1.2,
-                stagger: 0.3,
-                ease: "power3.out",
-                delay: 0.5
-            });
-            
-            // Subtle slow zoom for the video
-            gsap.to(videoRef.current, {
-                scale: 1.1,
-                duration: 20,
-                repeat: -1,
-                yoyo: true,
-                ease: "sine.inOut"
-            });
-        }, heroRef);
-
-        return () => ctx.revert();
-    }, []);
+    useGSAP(() => {
+        // Text entrance animation
+        gsap.from([textRef.current, subTextRef.current], {
+            y: 50,
+            opacity: 0,
+            duration: 1.2,
+            stagger: 0.3,
+            ease: "power3.out",
+            delay: 0.5
+        });
+        
+        // Subtle slow zoom for the video
+        gsap.to(videoRef.current, {
+            scale: 1.1,
+            duration: 20,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut"
+        });
+    }, { scope: heroRef });
 
     return (
         <div 
