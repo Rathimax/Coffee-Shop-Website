@@ -35,6 +35,59 @@ const Navbar = () => {
     }
   };
 
+  const NavLink = ({ href, children, onClick }) => {
+    const lineRef = useRef(null);
+
+    const onMouseEnter = () => {
+      gsap.to(lineRef.current, {
+        width: '100%',
+        duration: 0.4,
+        ease: 'power2.out',
+        overwrite: 'auto'
+      });
+    };
+
+    const onMouseLeave = () => {
+      gsap.to(lineRef.current, {
+        width: '0%',
+        duration: 0.3,
+        ease: 'power2.in',
+        overwrite: 'auto'
+      });
+    };
+
+    return (
+      <li onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+        <a 
+          href={href} 
+          onClick={onClick} 
+          style={{ 
+            position: 'relative', 
+            padding: '5px 0',
+            transition: 'color 0.3s ease',
+            display: 'inline-block'
+          }}
+        >
+          {children}
+          <span 
+            ref={lineRef}
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '0%',
+              height: '1.5px',
+              background: 'var(--accent)',
+              opacity: 0.6,
+              borderRadius: '2px'
+            }}
+          />
+        </a>
+      </li>
+    );
+  };
+
   return (
     <nav
       ref={navRef}
@@ -69,25 +122,34 @@ const Navbar = () => {
         Beige <span style={{ color: 'var(--accent)' }}>&</span> Beans
       </div>
       <ul style={{ display: 'flex', gap: '40px', fontWeight: '500', color: 'rgba(255,255,255,0.8)', justifySelf: 'center' }}>
-        <li><a href="#home" onClick={(e) => scrollToSection(e, '#home')} style={{ transition: 'color 0.3s ease' }}>Home</a></li>
-        <li><a href="#menu" onClick={(e) => scrollToSection(e, '#menu')} style={{ transition: 'color 0.3s ease' }}>Menu</a></li>
-        <li><a href="#about" onClick={(e) => scrollToSection(e, '#about')} style={{ transition: 'color 0.3s ease' }}>About</a></li>
-        <li><a href="#contact" onClick={(e) => scrollToSection(e, '#contact')} style={{ transition: 'color 0.3s ease' }}>Contact</a></li>
+        <NavLink href="#home" onClick={(e) => scrollToSection(e, '#home')}>Home</NavLink>
+        <NavLink href="#menu" onClick={(e) => scrollToSection(e, '#menu')}>Menu</NavLink>
+        <NavLink href="#about" onClick={(e) => scrollToSection(e, '#about')}>About</NavLink>
+        <NavLink href="#contact" onClick={(e) => scrollToSection(e, '#contact')}>Contact</NavLink>
       </ul>
       <button style={{
         background: 'rgba(163, 119, 100, 0.2)',
         WebkitBackdropFilter: 'blur(10px)',
         backdropFilter: 'blur(10px)',
         color: 'white',
-        padding: '12px 28px',
+        padding: '10px 24px',
         borderRadius: '20px',
         fontWeight: '600',
         justifySelf: 'end',
         border: '1px solid rgba(255, 255, 255, 0.2)',
         transition: 'all 0.3s ease',
         cursor: 'pointer',
-        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)'
+        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px'
       }}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M8 6V5a4 4 0 0 1 8 0v1" />
+          <path d="M5 6h14l-1 14H6L5 6z" />
+          <circle cx="10" cy="12" r="1.5" fill="currentColor" stroke="none" />
+          <circle cx="14" cy="12" r="1.5" fill="currentColor" stroke="none" />
+        </svg>
         Order Now
       </button>
     </nav>

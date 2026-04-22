@@ -7,11 +7,11 @@ gsap.registerPlugin(ScrollTrigger);
 
 // Guaranteed fallback data to ensure the UI is always beautiful and functional
 const FALLBACK_MENU = [
-    { id: 'f1', name: "Classic Espresso", description: "Rich and bold single shot of espresso roasted to perfection.", price: 3.50, category: "Hot", imageUrl: "/menu/hero-cafe.jpg" },
-    { id: 'f2', name: "Velvet Latte", description: "Smooth steamed milk with a double shot of espresso and silky foam.", price: 4.50, category: "Hot", imageUrl: "/coffee.png" },
-    { id: 'f3', name: "Iced Caramel Macchiato", description: "Layers of espresso, cold milk, and artisan caramel over ice.", price: 5.50, category: "Cold", imageUrl: "/coffee.png" },
-    { id: 'f4', name: "Hazelnut Mocha", description: "A premium blend of dark chocolate, espresso, and roasted hazelnut.", price: 4.75, category: "Hot", imageUrl: "/coffee.png" },
-    { id: 'f5', name: "Cold Brew", description: "Slow-steeped for 24 hours for an incredibly smooth, low-acid finish.", price: 4.00, category: "Cold", imageUrl: "/coffee.png" }
+    { id: 'f1', name: "Classic Espresso", description: "Rich and bold single shot of espresso roasted to perfection.", price: 3.50, category: "Hot", imageUrl: "/menu/classic-espresso.jpg" },
+    { id: 'f2', name: "Velvet Latte", description: "Smooth steamed milk with a double shot of espresso and silky foam.", price: 4.50, category: "Hot", imageUrl: "/menu/velvet-latte.jpg" },
+    { id: 'f3', name: "Iced Caramel Macchiato", description: "Layers of espresso, cold milk, and artisan caramel over ice.", price: 5.50, category: "Cold", imageUrl: "/menu/classic-espresso.jpg" },
+    { id: 'f4', name: "Hazelnut Mocha", description: "A premium blend of dark chocolate, espresso, and roasted hazelnut.", price: 4.75, category: "Hot", imageUrl: "/menu/velvet-latte.jpg" },
+    { id: 'f5', name: "Cold Brew", description: "Slow-steeped for 24 hours for an incredibly smooth, low-acid finish.", price: 4.00, category: "Cold", imageUrl: "/menu/classic-espresso.jpg" }
 ];
 
 const MenuSection = () => {
@@ -23,61 +23,26 @@ const MenuSection = () => {
     useEffect(() => {
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8081';
         
-        // Setting a timeout for the fetch to ensure we don't stay stuck on "Loading"
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => {
-            controller.abort();
-            console.warn("Backend fetch timed out, using fallback menu.");
-            setMenu(FALLBACK_MENU);
-            setLoading(false);
-        }, 3000);
-
-        fetch(`${apiUrl}/api/menu`, { signal: controller.signal })
+        fetch(`${apiUrl}/api/menu`)
             .then(res => {
                 if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                 return res.json();
             })
             .then(data => {
-                clearTimeout(timeoutId);
                 setMenu(Array.isArray(data) && data.length > 0 ? data : FALLBACK_MENU);
                 setLoading(false);
             })
             .catch(err => {
-                clearTimeout(timeoutId);
                 console.error("Failed to fetch menu, using fallback:", err);
                 setMenu(FALLBACK_MENU);
                 setLoading(false);
             });
-            
-        return () => clearTimeout(timeoutId);
     }, []);
 
     useEffect(() => {
         if (!loading && menu.length > 0) {
-            // Using gsap.context for clean animation management and cleanup
-            const ctx = gsap.context(() => {
-                gsap.fromTo(gridRef.current.children, 
-                    { y: 60, opacity: 0 },
-                    {
-                        scrollTrigger: {
-                            trigger: gridRef.current,
-                            start: "top 85%",
-                            once: true
-                        },
-                        y: 0,
-                        opacity: 1,
-                        duration: 1.2,
-                        stagger: 0.15,
-                        ease: "power3.out",
-                        clearProps: "opacity,transform"
-                    }
-                );
-            }, sectionRef);
-
             // Force a refresh of all ScrollTriggers once content is definitely in the DOM
             ScrollTrigger.refresh();
-
-            return () => ctx.revert();
         }
     }, [loading, menu]);
 
@@ -130,21 +95,40 @@ const MenuSection = () => {
                     Brewing your menu...
                 </div>
             ) : (
-                <div 
-                    ref={gridRef}
-                    style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-                        gap: '40px',
-                        maxWidth: '1300px',
-                        margin: '0 auto',
-                        padding: '20px'
-                    }}
-                >
-                    {menu.map(item => (
-                        <CoffeeCard key={item.id} item={item} />
-                    ))}
-                </div>
+                <>
+                    <style>{`
+                        .pinterest-grid {
+                            display: grid;
+                            grid-template-columns: repeat(5, 1fr); /* Increased to 5 columns for smaller cards */
+                            grid-auto-rows: 1px;
+                            gap: 0 16px; /* Reduced gap for more compact look */
+                            max-width: 1400px;
+                            margin: 0 auto;
+                            padding: 20px;
+                        }
+                        @media (max-width: 1200px) {
+                            .pinterest-grid { grid-template-columns: repeat(4, 1fr); }
+                        }
+                        @media (max-width: 900px) {
+                            .pinterest-grid { grid-template-columns: repeat(3, 1fr); }
+                        }
+                        @media (max-width: 600px) {
+                            .pinterest-grid { 
+                                grid-template-columns: repeat(2, 1fr); 
+                                padding: 10px; 
+                                gap: 0 10px; 
+                            }
+                        }
+                    `}</style>
+                    <div 
+                        ref={gridRef}
+                        className="pinterest-grid"
+                    >
+                        {menu.map((item, index) => (
+                            <CoffeeCard key={item.id || item._id || index} item={item} index={index} />
+                        ))}
+                    </div>
+                </>
             )}
         </section>
     );

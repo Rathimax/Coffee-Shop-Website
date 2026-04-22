@@ -25,10 +25,10 @@ public class CoffeeMenuController {
     // Hardcoded fallback menu for immediate display when DB is unreachable
     private static final List<CoffeeItem> FALLBACK_MENU = List.of(
             new CoffeeItem("f1", "Classic Espresso", "Rich and bold single shot of espresso roasted to perfection.", 3.50, "Hot", "/menu/classic-espresso.jpg"),
-            new CoffeeItem("f2", "Velvet Latte", "Smooth steamed milk with a double shot of espresso and silky foam.", 4.50, "Hot", "/coffee.png"),
-            new CoffeeItem("f3", "Iced Caramel Macchiato", "Layers of espresso, cold milk, and artisan caramel over ice.", 5.50, "Cold", "/coffee.png"),
-            new CoffeeItem("f4", "Hazelnut Mocha", "A premium blend of dark chocolate, espresso, and roasted hazelnut.", 4.75, "Hot", "/coffee.png"),
-            new CoffeeItem("f5", "Cold Brew", "Slow-steeped for 24 hours for an incredibly smooth, low-acid finish.", 4.00, "Cold", "/coffee.png")
+            new CoffeeItem("f2", "Velvet Latte", "Smooth steamed milk with a double shot of espresso and silky foam.", 4.50, "Hot", "/menu/velvet-latte.jpg"),
+            new CoffeeItem("f3", "Iced Caramel Macchiato", "Layers of espresso, cold milk, and artisan caramel over ice.", 5.50, "Cold", "/menu/classic-espresso.jpg"),
+            new CoffeeItem("f4", "Hazelnut Mocha", "A premium blend of dark chocolate, espresso, and roasted hazelnut.", 4.75, "Hot", "/menu/velvet-latte.jpg"),
+            new CoffeeItem("f5", "Cold Brew", "Slow-steeped for 24 hours for an incredibly smooth, low-acid finish.", 4.00, "Cold", "/menu/classic-espresso.jpg")
     );
 
     @GetMapping
