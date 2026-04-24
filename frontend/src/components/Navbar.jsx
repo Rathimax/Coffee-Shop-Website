@@ -150,7 +150,7 @@ const Navbar = () => {
           <circle cx="10" cy="12" r="1.5" fill="currentColor" stroke="none" />
           <circle cx="14" cy="12" r="1.5" fill="currentColor" stroke="none" />
         </svg>
-        Order Now
+        Cart
       </button>
     </nav>
   );

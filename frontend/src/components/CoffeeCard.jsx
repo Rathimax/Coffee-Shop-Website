@@ -49,7 +49,7 @@ const CoffeeCard = ({ item, index }) => {
         overflow: 'hidden',
         position: 'relative',
         gridRowEnd: `span ${gridSpan}`,
-        margin: '12px 0',
+        margin: '8px 0',
         opacity: 1,
         visibility: 'visible',
       }}

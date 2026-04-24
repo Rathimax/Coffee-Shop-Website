@@ -26,7 +26,7 @@ const AboutSection = () => {
             id="about"
             ref={sectionRef}
             style={{
-                padding: '50px 5% 100px',
+                padding: '0px 5% 100px',
                 background: 'var(--background)',
                 textAlign: 'center',
                 position: 'relative',
