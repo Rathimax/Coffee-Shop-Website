@@ -14,7 +14,7 @@ const FALLBACK_MENU = [
     { id: 'f5', name: "Cold Brew", description: "Slow-steeped for 24 hours for an incredibly smooth, low-acid finish.", price: 4.00, category: "Cold", imageUrl: "/menu/classic-espresso.jpg" }
 ];
 
-const MenuSection = () => {
+const MenuSection = ({ searchQuery, user, onOrderRequired }) => {
     const [menu, setMenu] = useState([]);
     const [loading, setLoading] = useState(true);
     const sectionRef = useRef(null);
@@ -39,12 +39,17 @@ const MenuSection = () => {
             });
     }, []);
 
+    const filteredMenu = menu.filter(item => 
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     useEffect(() => {
         if (!loading && menu.length > 0) {
-            // Force a refresh of all ScrollTriggers once content is definitely in the DOM
             ScrollTrigger.refresh();
         }
-    }, [loading, menu]);
+    }, [loading, menu, searchQuery]);
 
     return (
         <section 
@@ -81,6 +86,11 @@ const MenuSection = () => {
                 }}>
                     From the rich intensity of our classic espresso to the creamy indulgence of our ivory velvet lattes.
                 </p>
+                {searchQuery && (
+                    <p style={{ marginTop: '20px', fontSize: '0.9rem', color: 'var(--primary)', opacity: 0.8 }}>
+                        Filtering results for "{searchQuery}"
+                    </p>
+                )}
             </div>
 
             {loading ? (
@@ -99,9 +109,9 @@ const MenuSection = () => {
                     <style>{`
                         .pinterest-grid {
                             display: grid;
-                            grid-template-columns: repeat(5, 1fr); /* Increased to 5 columns for smaller cards */
+                            grid-template-columns: repeat(5, 1fr);
                             grid-auto-rows: 1px;
-                            gap: 0 16px; /* Reduced gap for more compact look */
+                            gap: 0 16px;
                             max-width: 1400px;
                             margin: 0 auto;
                             padding: 20px;
@@ -119,14 +129,32 @@ const MenuSection = () => {
                                 gap: 0 10px; 
                             }
                         }
+                        .no-results {
+                            grid-column: 1 / -1;
+                            padding: 100px 0;
+                            color: var(--muted-foreground);
+                            font-size: 1.2rem;
+                        }
                     `}</style>
                     <div 
                         ref={gridRef}
                         className="pinterest-grid"
                     >
-                        {menu.map((item, index) => (
-                            <CoffeeCard key={item.id || item._id || index} item={item} index={index} />
-                        ))}
+                        {filteredMenu.length > 0 ? (
+                            filteredMenu.map((item, index) => (
+                                <CoffeeCard 
+                                    key={item.id || item._id || index} 
+                                    item={item} 
+                                    index={index} 
+                                    user={user} 
+                                    onOrderRequired={onOrderRequired} 
+                                />
+                            ))
+                        ) : (
+                            <div className="no-results">
+                                <p>No coffee matches your search. Maybe try "latte" or "espresso"? ☕</p>
+                            </div>
+                        )}
                     </div>
                 </>
             )}

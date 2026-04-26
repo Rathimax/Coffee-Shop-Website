@@ -1,7 +1,18 @@
 import React, { useState } from 'react';
 
-const CoffeeCard = ({ item, index }) => {
+const CoffeeCard = ({ item, index, user, onOrderRequired }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [orderStatus, setOrderStatus] = useState(null);
+
+  const handleOrder = (e) => {
+    e.stopPropagation();
+    if (!user) {
+      onOrderRequired();
+    } else {
+      setOrderStatus('Added to bag! ☕');
+      setTimeout(() => setOrderStatus(null), 2000);
+    }
+  };
 
   // Smart Aspect Ratio Logic: Fluctuates height based on index to create Pinterest masonry effect
   const aspectRatios = ['130%', '160%', '110%', '145%'];
@@ -114,22 +125,25 @@ const CoffeeCard = ({ item, index }) => {
           </div>
 
           {/* Pinterest-style Save/Order Button */}
-          <button style={{
-            alignSelf: 'flex-end',
-            background: 'var(--primary)',
-            color: 'white',
-            padding: '10px 20px',
-            borderRadius: '25px',
-            border: 'none',
-            fontWeight: '700',
-            fontSize: '0.9rem',
-            cursor: 'pointer',
-            opacity: isHovered ? 1 : 0,
-            transform: isHovered ? 'scale(1)' : 'scale(0.8)',
-            transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-            boxShadow: '0 8px 20px rgba(0,0,0,0.2)',
-          }}>
-            Order
+          <button 
+            onClick={handleOrder}
+            style={{
+              alignSelf: 'flex-end',
+              background: orderStatus ? '#4CAF50' : 'var(--primary)',
+              color: 'white',
+              padding: '10px 20px',
+              borderRadius: '25px',
+              border: 'none',
+              fontWeight: '700',
+              fontSize: '0.9rem',
+              cursor: 'pointer',
+              opacity: isHovered || orderStatus ? 1 : 0,
+              transform: isHovered || orderStatus ? 'scale(1)' : 'scale(0.8)',
+              transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+              boxShadow: '0 8px 20px rgba(0,0,0,0.2)',
+            }}
+          >
+            {orderStatus || 'Order'}
           </button>
         </div>
       </div>

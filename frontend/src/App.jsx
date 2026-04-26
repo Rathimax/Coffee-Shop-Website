@@ -3,14 +3,34 @@ import Navbar from './components/Navbar'
 import CoffeeHero from './components/CoffeeHero'
 import MenuSection from './components/MenuSection'
 import AboutSection from './components/AboutSection'
+import LoginModal from './components/LoginModal'
+import { auth } from './firebase'
+import { onAuthStateChanged } from 'firebase/auth'
 import './App.css'
 
 function App() {
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [user, setUser] = React.useState(null);
+  const [showLoginModal, setShowLoginModal] = React.useState(false);
+
+  React.useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
   return (
     <div className="App">
-      <Navbar />
+      <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+      <Navbar 
+        searchQuery={searchQuery} 
+        setSearchQuery={setSearchQuery} 
+        user={user} 
+        onLoginClick={() => setShowLoginModal(true)} 
+      />
       <CoffeeHero />
-      <MenuSection />
+      <MenuSection searchQuery={searchQuery} user={user} onOrderRequired={() => setShowLoginModal(true)} />
       <AboutSection />
 
       {/* Footer Section */}
