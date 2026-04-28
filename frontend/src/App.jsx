@@ -9,7 +9,7 @@ import CartDrawer from './components/CartDrawer'
 import AccountDrawer from './components/AccountDrawer'
 import { auth } from './firebase'
 import { onAuthStateChanged } from 'firebase/auth'
-import './App.css'
+import { cartService } from './services/cartService'
 
 function App() {
   const [searchQuery, setSearchQuery] = React.useState('');
@@ -19,11 +19,60 @@ function App() {
   const [cart, setCart] = React.useState([]);
   const [isCartOpen, setIsCartOpen] = React.useState(false);
   const [isAccountOpen, setIsAccountOpen] = React.useState(false);
+  const [isInitialLoad, setIsInitialLoad] = React.useState(true);
+
+  // 1. Initial load (LocalStorage for guests, then DB if logged in)
+  React.useEffect(() => {
+    const init = async () => {
+      const savedCart = localStorage.getItem('beige_beans_cart');
+      if (savedCart) {
+        setCart(JSON.parse(savedCart));
+      }
+      setIsInitialLoad(false);
+    };
+    init();
+  }, []);
+
+  // 2. Fetch/Merge cart on login
+  React.useEffect(() => {
+    if (!user || isInitialLoad) return;
+
+    const syncOnLogin = async () => {
+      const dbCart = await cartService.getCart(user.uid);
+      const localCart = JSON.parse(localStorage.getItem('beige_beans_cart') || '[]');
+      
+      if (dbCart.length > 0) {
+        // Simple merge: Prefer DB items, but add local items that don't exist in DB
+        const mergedCart = [...dbCart];
+        for (const localItem of localCart) {
+          const itemId = localItem.id || localItem._id;
+          if (!mergedCart.find(i => i.id === itemId)) {
+            mergedCart.push(localItem);
+            await cartService.saveItem(user.uid, localItem);
+          }
+        }
+        setCart(mergedCart);
+      } else if (localCart.length > 0) {
+        // If DB empty but local has items, upload local cart
+        for (const item of localCart) {
+          await cartService.saveItem(user.uid, item);
+        }
+        setCart(localCart);
+      }
+    };
+    syncOnLogin();
+  }, [user, isInitialLoad]);
+
+  // 3. One-way Sync to DB whenever cart state changes (debounced/throttled or simple)
+  // We'll use individual actions to sync to avoid full-sync overhead
+  
+  React.useEffect(() => {
+    localStorage.setItem('beige_beans_cart', JSON.stringify(cart));
+  }, [cart]);
 
   React.useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      // Show details form if user is logged in but has no display name (common for new email signups)
       if (currentUser && !currentUser.displayName) {
         setShowDetailsForm(true);
       } else {
@@ -34,27 +83,61 @@ function App() {
   }, []);
 
   const addToCart = (item) => {
+    const itemId = item.id || item._id;
     setCart(prevCart => {
-      const existingItem = prevCart.find(i => i.id === item.id);
+      const existingItem = prevCart.find(i => i.id === itemId);
       if (existingItem) {
-        return prevCart.map(i => i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i);
+        return prevCart.map(i => i.id === itemId ? { ...i, quantity: i.quantity + 1 } : i);
+      } else {
+        return [...prevCart, { ...item, id: itemId, quantity: 1 }];
       }
-      return [...prevCart, { ...item, quantity: 1 }];
     });
+
+    if (user) {
+      // Find the updated quantity after state update (or just use logic)
+      setCart(currentCart => {
+        const updatedItem = currentCart.find(i => i.id === itemId);
+        if (updatedItem) {
+          cartService.saveItem(user.uid, updatedItem);
+        }
+        return currentCart;
+      });
+    }
   };
 
   const removeFromCart = (id) => {
     setCart(prevCart => prevCart.filter(item => item.id !== id));
+    if (user) {
+      cartService.removeItem(user.uid, id);
+    }
   };
 
   const updateQuantity = (id, delta) => {
-    setCart(prevCart => prevCart.map(item => {
-      if (item.id === id) {
-        const newQty = Math.max(0, item.quantity + delta);
-        return { ...item, quantity: newQty };
-      }
-      return item;
-    }).filter(item => item.quantity > 0));
+    setCart(prevCart => {
+      const newCart = prevCart.map(item => {
+        if (item.id === id) {
+          const newQty = Math.max(0, item.quantity + delta);
+          return { ...item, quantity: newQty };
+        }
+        return item;
+      }).filter(item => item.quantity > 0);
+      
+      return newCart;
+    });
+
+    if (user) {
+      // Use a timeout or secondary effect to sync after state update
+      // For now, let's just use the current cart in a separate call
+      setCart(currentCart => {
+        const updatedItem = currentCart.find(i => i.id === id);
+        if (updatedItem) {
+          cartService.saveItem(user.uid, updatedItem);
+        } else {
+          cartService.removeItem(user.uid, id);
+        }
+        return currentCart;
+      });
+    }
   };
 
   return (

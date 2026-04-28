@@ -16,8 +16,9 @@ const CartDrawer = ({ isOpen, onClose, cart, updateQuantity, removeFromCart }) =
       gsap.to(drawerRef.current, { x: 0, duration: 0.6, ease: 'power4.out' });
       
       // Stagger items
-      if (itemsRef.current.length > 0) {
-        gsap.fromTo(itemsRef.current, 
+      const validItems = itemsRef.current.filter(el => el !== null);
+      if (validItems.length > 0) {
+        gsap.fromTo(validItems, 
           { opacity: 0, x: 20 }, 
           { opacity: 1, x: 0, stagger: 0.1, duration: 0.5, delay: 0.3 }
         );
@@ -37,7 +38,7 @@ const CartDrawer = ({ isOpen, onClose, cart, updateQuantity, removeFromCart }) =
     };
   }, [isOpen]);
 
-  const subtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  const subtotal = (cart || []).reduce((acc, item) => acc + (Number(item.price || 0) * Number(item.quantity || 0)), 0) || 0;
   const tax = subtotal * 0.1; // 10% tax
   const total = subtotal + tax;
 
@@ -192,8 +193,11 @@ const CartDrawer = ({ isOpen, onClose, cart, updateQuantity, removeFromCart }) =
           ) : (
             cart.map((item, index) => (
               <div 
-                key={item.id}
-                ref={el => itemsRef.current[index] = el}
+                key={item.id || `cart-item-${index}`}
+                ref={el => {
+                  if (el) itemsRef.current[index] = el;
+                  else itemsRef.current[index] = null;
+                }}
                 style={{
                   display: 'flex',
                   gap: '15px',
