@@ -91,10 +91,11 @@ const NavIcon = ({ children, onClick, style }) => (
   </button>
 );
 
-const Navbar = ({ searchQuery, setSearchQuery, user, onLoginClick }) => {
+const Navbar = ({ searchQuery, setSearchQuery, user, onLoginClick, onAccountClick, onCartClick, cartCount }) => {
   const navRef = useRef(null);
   const actionIconsRef = useRef(null);
   const searchInputRef = useRef(null);
+  const badgeRef = useRef(null);
   const [isSearching, setIsSearching] = useState(false);
 
   useGSAP(() => {
@@ -118,6 +119,22 @@ const Navbar = ({ searchQuery, setSearchQuery, user, onLoginClick }) => {
         });
     }
   }, { scope: navRef });
+
+  // Pulse badge when cartCount changes
+  useGSAP(() => {
+    if (cartCount > 0) {
+      gsap.fromTo(badgeRef.current, 
+        { scale: 0.5, opacity: 0 }, 
+        { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(2)" }
+      );
+      gsap.to(badgeRef.current, {
+        keyframes: [
+          { scale: 1.3, duration: 0.2 },
+          { scale: 1, duration: 0.2 }
+        ]
+      });
+    }
+  }, { dependencies: [cartCount], scope: navRef });
 
   // Handle search expansion animation
   useGSAP(() => {
@@ -303,11 +320,12 @@ const Navbar = ({ searchQuery, setSearchQuery, user, onLoginClick }) => {
           )}
         </div>
 
-        <div className="profile-icon">
+        <div className="profile-icon" style={{ position: 'relative' }}>
           {user ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <button 
-                    onClick={() => logout()}
+                    className="profile-trigger"
+                    onClick={onAccountClick}
                     style={{
                         width: '32px',
                         height: '32px',
@@ -315,9 +333,11 @@ const Navbar = ({ searchQuery, setSearchQuery, user, onLoginClick }) => {
                         overflow: 'hidden',
                         border: '2px solid var(--accent)',
                         cursor: 'pointer',
-                        padding: 0
+                        padding: 0,
+                        transition: 'transform 0.3s ease'
                     }}
-                    title="Logout"
+                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                 >
                     <img src={user.photoURL} alt={user.displayName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </button>
@@ -333,13 +353,39 @@ const Navbar = ({ searchQuery, setSearchQuery, user, onLoginClick }) => {
         </div>
 
         <div className="bag-icon">
-          <NavIcon>
+          <NavIcon onClick={onCartClick} style={{ position: 'relative' }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M8 6V5a4 4 0 0 1 8 0v1" />
               <path d="M5 6h14l-1 14H6L5 6z" />
               <circle cx="10" cy="12" r="1.5" fill="currentColor" stroke="none" />
               <circle cx="14" cy="12" r="1.5" fill="currentColor" stroke="none" />
             </svg>
+            {cartCount > 0 && (
+              <span 
+                ref={badgeRef}
+                style={{
+                  position: 'absolute',
+                  top: '-2px',
+                  right: '-2px',
+                  background: 'var(--accent)',
+                  color: 'var(--foreground)',
+                  fontSize: '0.65rem',
+                  fontWeight: '800',
+                  minWidth: '16px',
+                  height: '16px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                  border: '1.5px solid #3c332e', // Dark contrast border
+                  padding: '0 4px',
+                  fontFamily: 'var(--font-mono)'
+                }}
+              >
+                {cartCount}
+              </span>
+            )}
           </NavIcon>
         </div>
       </div>

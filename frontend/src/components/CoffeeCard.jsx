@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const CoffeeCard = ({ item, index, user, onOrderRequired }) => {
+const CoffeeCard = ({ item, index, user, onOrderRequired, onAddToCart }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [orderStatus, setOrderStatus] = useState(null);
 
@@ -9,7 +9,8 @@ const CoffeeCard = ({ item, index, user, onOrderRequired }) => {
     if (!user) {
       onOrderRequired();
     } else {
-      setOrderStatus('Added to bag! ☕');
+      onAddToCart(item);
+      setOrderStatus('ADDED');
       setTimeout(() => setOrderStatus(null), 2000);
     }
   };
@@ -129,21 +130,31 @@ const CoffeeCard = ({ item, index, user, onOrderRequired }) => {
             onClick={handleOrder}
             style={{
               alignSelf: 'flex-end',
-              background: orderStatus ? '#4CAF50' : 'var(--primary)',
+              background: orderStatus ? '#A68B6A' : 'var(--primary)', // Warm beige for added state
               color: 'white',
-              padding: '10px 20px',
+              padding: '6px 14px',
               borderRadius: '25px',
               border: 'none',
               fontWeight: '700',
-              fontSize: '0.9rem',
+              fontSize: '0.65rem',
               cursor: 'pointer',
               opacity: isHovered || orderStatus ? 1 : 0,
               transform: isHovered || orderStatus ? 'scale(1)' : 'scale(0.8)',
-              transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)', // Smoother transition
               boxShadow: '0 8px 20px rgba(0,0,0,0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
             }}
           >
-            {orderStatus || 'Order'}
+            {orderStatus ? (
+              <>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                {orderStatus}
+              </>
+            ) : 'ADD TO CART'}
           </button>
         </div>
       </div>

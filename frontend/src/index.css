@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=IBM+Plex+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 
 :root {
   --card: #F1F0E5;
@@ -16,7 +16,7 @@
   --popover: #FFFFFF;
   --primary: #A37764;
   --sidebar: #ebd6cb;
-  --font-mono: Menlo, monospace;
+  --font-mono: "IBM Plex Mono", monospace;
   --font-sans: "DM Sans", sans-serif;
   --font-serif: "Playfair Display", serif;
   --secondary: #BAAB92;

@@ -1,6 +1,9 @@
 import React, { useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
+
+gsap.registerPlugin(ScrollToPlugin);
 
 const CoffeeHero = () => {
     const heroRef = useRef(null);
@@ -36,6 +39,14 @@ const CoffeeHero = () => {
             ease: "sine.inOut"
         });
     }, { scope: heroRef });
+
+    const scrollToAbout = () => {
+        gsap.to(window, { 
+            duration: 1.5, 
+            scrollTo: { y: "#about", offsetY: 80 }, 
+            ease: "power4.inOut" 
+        });
+    };
 
     return (
         <section
@@ -133,20 +144,23 @@ const CoffeeHero = () => {
                         cursor: 'pointer',
                         transition: 'transform 0.3s ease'
                     }}>
-                        Explore Menu
+                        Ethiopia Coffee
                     </button>
-                    <button style={{
-                        border: '2px solid rgba(255,255,255,0.8)',
-                        color: 'white',
-                        padding: '18px 45px',
-                        borderRadius: '40px',
-                        fontSize: '1.1rem',
-                        fontWeight: '700',
-                        backdropFilter: 'blur(10px)',
-                        background: 'transparent',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease'
-                    }}>
+                    <button 
+                        onClick={scrollToAbout}
+                        style={{
+                            border: '2px solid rgba(255,255,255,0.8)',
+                            color: 'white',
+                            padding: '18px 45px',
+                            borderRadius: '40px',
+                            fontSize: '1.1rem',
+                            fontWeight: '700',
+                            backdropFilter: 'blur(10px)',
+                            background: 'transparent',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease'
+                        }}
+                    >
                         Our Story
                     </button>
                 </div>
