@@ -1,8 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { useNavigate } from 'react-router-dom';
 import { logout } from '../firebase';
 
 const AccountDrawer = ({ isOpen, onClose, user }) => {
+  const navigate = useNavigate();
   const drawerRef = useRef(null);
   const overlayRef = useRef(null);
   const contentRef = useRef(null);
@@ -144,7 +146,22 @@ const AccountDrawer = ({ isOpen, onClose, user }) => {
               border: '3px solid #f1f0e5',
               boxShadow: '0 5px 15px rgba(0,0,0,0.1)'
             }}>
-              <img src={user.photoURL} alt={user.displayName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              {user.photoURL ? (
+                <img 
+                  src={user.photoURL} 
+                  alt={user.displayName} 
+                  referrerPolicy="no-referrer"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                />
+              ) : (
+                <div style={{ 
+                  width: '100%', height: '100%', background: '#e0ddd7', 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                  fontSize: '28px', color: '#665c54', fontWeight: '500', fontFamily: 'var(--font-serif)'
+                }}>
+                  {user.displayName ? user.displayName.charAt(0).toUpperCase() : user.email?.charAt(0).toUpperCase()}
+                </div>
+              )}
             </div>
             <div>
               <h3 style={{ margin: 0, fontSize: '1.2rem', fontFamily: 'var(--font-serif)' }}>{user.displayName}</h3>
@@ -196,6 +213,29 @@ const AccountDrawer = ({ isOpen, onClose, user }) => {
           borderTop: '1px solid rgba(0,0,0,0.05)',
           background: '#f9f8f6'
         }}>
+          {user.email === 'abhayrajrathi616@gmail.com' && (
+            <button 
+              onClick={() => {
+                navigate('/admin');
+                onClose();
+              }}
+              style={{
+                width: '100%',
+                padding: '12px',
+                background: '#a37764',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '0.85rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                marginBottom: '10px',
+                transition: 'all 0.3s ease',
+              }}
+            >
+              Go to Admin Dashboard
+            </button>
+          )}
           <button 
             onClick={() => {
               logout();

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 
-const CartDrawer = ({ isOpen, onClose, cart, updateQuantity, removeFromCart }) => {
+const CartDrawer = ({ isOpen, onClose, cart, updateQuantity, removeFromCart, onCheckout }) => {
   const drawerRef = useRef(null);
   const overlayRef = useRef(null);
   const itemsRef = useRef([]);
@@ -326,7 +326,9 @@ const CartDrawer = ({ isOpen, onClose, cart, updateQuantity, removeFromCart }) =
               </div>
             </div>
 
-            <button style={{
+            <button 
+              onClick={onCheckout}
+              style={{
               width: '100%',
               padding: '10px',
               background: 'var(--primary)',

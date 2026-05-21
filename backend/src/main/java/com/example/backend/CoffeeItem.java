@@ -12,6 +12,11 @@ public class CoffeeItem {
     private double price;
     private String category;
     private String imageUrl;
+    private boolean isAvailable = true;
+    private Integer stockQuantity;
+    private String stockType; // "exact" or "approximate"
+    private Integer initialEstimate;
+    private String stockSetAt; // ISO date string
 
     public CoffeeItem() {}
 
@@ -41,4 +46,19 @@ public class CoffeeItem {
 
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public boolean isAvailable() { return isAvailable; }
+    public void setAvailable(boolean available) { isAvailable = available; }
+
+    public Integer getStockQuantity() { return stockQuantity; }
+    public void setStockQuantity(Integer stockQuantity) { this.stockQuantity = stockQuantity; }
+
+    public String getStockType() { return stockType; }
+    public void setStockType(String stockType) { this.stockType = stockType; }
+
+    public Integer getInitialEstimate() { return initialEstimate; }
+    public void setInitialEstimate(Integer initialEstimate) { this.initialEstimate = initialEstimate; }
+
+    public String getStockSetAt() { return stockSetAt; }
+    public void setStockSetAt(String stockSetAt) { this.stockSetAt = stockSetAt; }
 }

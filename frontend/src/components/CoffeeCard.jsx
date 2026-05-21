@@ -4,6 +4,8 @@ const CoffeeCard = ({ item, index, user, onOrderRequired, onAddToCart }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [orderStatus, setOrderStatus] = useState(null);
 
+  const isSoldOut = item.available === false || (item.stockQuantity !== undefined && item.stockQuantity <= 0);
+
   const handleOrder = (e) => {
     e.stopPropagation();
     if (!user) {
@@ -62,8 +64,10 @@ const CoffeeCard = ({ item, index, user, onOrderRequired, onAddToCart }) => {
         position: 'relative',
         gridRowEnd: `span ${gridSpan}`,
         margin: '8px 0',
-        opacity: 1,
+        opacity: isSoldOut ? 0.6 : 1,
+        filter: isSoldOut ? 'grayscale(80%)' : 'none',
         visibility: 'visible',
+        pointerEvents: isSoldOut ? 'none' : 'auto'
       }}
     >
       {/* Image Container with Dynamic Aspect Ratio */}
@@ -104,58 +108,60 @@ const CoffeeCard = ({ item, index, user, onOrderRequired, onAddToCart }) => {
           padding: '12px',
           justifyContent: 'space-between',
         }}>
-          {/* Category Badge */}
+          {/* Category/Status Badge */}
           <div style={{
             alignSelf: 'flex-start',
-            opacity: isHovered ? 1 : 0,
-            transform: isHovered ? 'translateY(0)' : 'translateY(-10px)',
+            opacity: (isHovered || isSoldOut) ? 1 : 0,
+            transform: (isHovered || isSoldOut) ? 'translateY(0)' : 'translateY(-10px)',
             transition: 'all 0.3s ease',
           }}>
             <span style={{ 
               fontSize: '0.7rem', 
-              background: 'rgba(255,255,255,0.9)', 
+              background: isSoldOut ? 'rgba(217, 48, 37, 0.9)' : 'rgba(255,255,255,0.9)', 
               backdropFilter: 'blur(5px)',
               padding: '4px 12px', 
               borderRadius: '20px',
-              color: 'var(--primary)',
+              color: isSoldOut ? 'white' : 'var(--primary)',
               fontWeight: '700',
               boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
             }}>
-              {item.category}
+              {isSoldOut ? 'SOLD OUT' : item.category}
             </span>
           </div>
 
           {/* Pinterest-style Save/Order Button */}
-          <button 
-            onClick={handleOrder}
-            style={{
-              alignSelf: 'flex-end',
-              background: orderStatus ? '#A68B6A' : 'var(--primary)', // Warm beige for added state
-              color: 'white',
-              padding: '6px 14px',
-              borderRadius: '25px',
-              border: 'none',
-              fontWeight: '700',
-              fontSize: '0.65rem',
-              cursor: 'pointer',
-              opacity: isHovered || orderStatus ? 1 : 0,
-              transform: isHovered || orderStatus ? 'scale(1)' : 'scale(0.8)',
-              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)', // Smoother transition
-              boxShadow: '0 8px 20px rgba(0,0,0,0.2)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
-          >
-            {orderStatus ? (
-              <>
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-                {orderStatus}
-              </>
-            ) : 'ADD TO CART'}
-          </button>
+          {!isSoldOut && (
+            <button 
+              onClick={handleOrder}
+              style={{
+                alignSelf: 'flex-end',
+                background: orderStatus ? '#A68B6A' : 'var(--primary)', // Warm beige for added state
+                color: 'white',
+                padding: '6px 14px',
+                borderRadius: '25px',
+                border: 'none',
+                fontWeight: '700',
+                fontSize: '0.65rem',
+                cursor: 'pointer',
+                opacity: isHovered || orderStatus ? 1 : 0,
+                transform: isHovered || orderStatus ? 'scale(1)' : 'scale(0.8)',
+                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)', // Smoother transition
+                boxShadow: '0 8px 20px rgba(0,0,0,0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              {orderStatus ? (
+                <>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  {orderStatus}
+                </>
+              ) : 'ADD TO CART'}
+            </button>
+          )}
         </div>
       </div>
 

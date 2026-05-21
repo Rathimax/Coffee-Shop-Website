@@ -3,14 +3,16 @@ package com.example.backend;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/menu")
@@ -34,7 +36,6 @@ public class CoffeeMenuController {
     @GetMapping
     public List<CoffeeItem> getMenu() {
         try {
-            // Try to fetch from real MongoDB
             List<CoffeeItem> menu = repository.findAll();
             if (menu.isEmpty()) {
                 logger.info("Database is empty, serving fallback menu.");
@@ -42,10 +43,61 @@ public class CoffeeMenuController {
             }
             return menu;
         } catch (Exception e) {
-            // Handle DB connection failures gracefully
             logger.error("Database connection failed. Serving fallback menu. Error: {}", e.getMessage());
             return FALLBACK_MENU;
         }
+    }
+
+    @PostMapping
+    public CoffeeItem addMenuItem(@RequestBody CoffeeItem item) {
+        return repository.save(item);
+    }
+
+    @PutMapping("/{id}")
+    public CoffeeItem updateMenuItem(@PathVariable String id, @RequestBody CoffeeItem item) {
+        item.setId(id);
+        return repository.save(item);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteMenuItem(@PathVariable String id) {
+        repository.deleteById(id);
+    }
+
+    @PostMapping("/{id}/reconcile")
+    public ResponseEntity<?> reconcileStock(@PathVariable String id, @RequestBody Map<String, Integer> payload) {
+        Optional<CoffeeItem> itemOpt = repository.findById(id);
+        if (itemOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        CoffeeItem item = itemOpt.get();
+        int actualCount = payload.getOrDefault("actualCount", 0);
+        int currentStock = item.getStockQuantity() != null ? item.getStockQuantity() : 0;
+        int initialEst = item.getInitialEstimate() != null ? item.getInitialEstimate() : currentStock;
+        int ordersDeducted = initialEst - currentStock;
+        int expectedStock = currentStock; // after deductions
+        int variance = expectedStock - actualCount; // positive = loss, negative = gain
+
+        // Reset to exact mode with actual count
+        item.setStockQuantity(actualCount);
+        item.setStockType("exact");
+        item.setInitialEstimate(actualCount);
+        item.setStockSetAt(Instant.now().toString());
+        if (actualCount <= 0) {
+            item.setAvailable(false);
+        }
+        repository.save(item);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("item", item);
+        result.put("initialEstimate", initialEst);
+        result.put("ordersDeducted", ordersDeducted);
+        result.put("expectedStock", expectedStock);
+        result.put("actualCount", actualCount);
+        result.put("variance", variance);
+
+        return ResponseEntity.ok(result);
     }
 
     @Bean
