@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../firebase';
+import { profileService } from '../services/profileService';
 
 const AccountDrawer = ({ isOpen, onClose, user }) => {
   const navigate = useNavigate();
@@ -30,6 +31,53 @@ const AccountDrawer = ({ isOpen, onClose, user }) => {
     };
   }, [isOpen]);
 
+  const [profileData, setProfileData] = useState({
+    'Full Name': user?.displayName || 'Not Set',
+    'Email Address': user?.email || '',
+    'Phone Number': user?.phoneNumber || 'Not provided',
+    'Receiver Name': '',
+    'Street Address': '',
+    'City': '',
+    'State': '',
+    'Pincode': ''
+  });
+
+  const [editingField, setEditingField] = useState(null);
+  const [editValue, setEditValue] = useState('');
+  const [loadingProfile, setLoadingProfile] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (isOpen && user) {
+      const fetchProfile = async () => {
+        setLoadingProfile(true);
+        try {
+          const data = await profileService.getProfile(user.uid);
+          if (isMounted && data) {
+            setProfileData(prev => ({
+              ...prev,
+              ...data,
+              'Full Name': data['Full Name'] || user.displayName || 'Not Set',
+              'Email Address': user.email,
+            }));
+          } else if (isMounted) {
+            setProfileData(prev => ({
+              ...prev,
+              'Full Name': prev['Full Name'] === 'Not Set' && user.displayName ? user.displayName : prev['Full Name'],
+              'Email Address': prev['Email Address'] || user.email,
+            }));
+          }
+        } catch (error) {
+          console.error("Failed to load profile", error);
+        } finally {
+          if (isMounted) setLoadingProfile(false);
+        }
+      };
+      fetchProfile();
+    }
+    return () => { isMounted = false; };
+  }, [isOpen, user]);
+
   if (!user) return null;
 
   const memberSince = user.metadata?.creationTime 
@@ -40,21 +88,25 @@ const AccountDrawer = ({ isOpen, onClose, user }) => {
     {
       title: 'Personal Information',
       items: [
-        { label: 'Full Name', value: user.displayName || 'Not Set' },
-        { label: 'Email Address', value: user.email },
-        { label: 'Phone Number', value: user.phoneNumber || 'Not provided' },
+        { label: 'Full Name', value: profileData['Full Name'] },
+        { label: 'Email Address', value: profileData['Email Address'] },
+        { label: 'Phone Number', value: profileData['Phone Number'] },
       ]
     },
     {
       title: 'Shipping Address',
       items: [
-        { label: 'Default Address', value: 'No address on file' },
+        { label: 'Receiver Name', value: profileData['Receiver Name'] || 'Not provided' },
+        { label: 'Street Address', value: profileData['Street Address'] || 'Not provided' },
+        { label: 'City', value: profileData['City'] || 'Not provided' },
+        { label: 'State', value: profileData['State'] || 'Not provided' },
+        { label: 'Pincode', value: profileData['Pincode'] || 'Not provided' },
       ]
     },
     {
       title: 'Order History',
       items: [
-        { label: 'Recent Orders', value: 'No orders yet' },
+        { label: 'Recent Orders', value: 'No orders yet', disableEdit: true },
       ]
     }
   ];
@@ -183,25 +235,66 @@ const AccountDrawer = ({ isOpen, onClose, user }) => {
                 {section.title}
               </h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                {section.items.map((item, iIdx) => (
+                {section.items.map((item, iIdx) => {
+                  const isEditing = editingField === item.label;
+                  return (
                   <div key={iIdx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div style={{ fontSize: '0.85rem' }}>
+                    <div style={{ fontSize: '0.85rem', width: '100%' }}>
                       <p style={{ margin: 0, opacity: 0.4, marginBottom: '4px' }}>{item.label}</p>
-                      <p style={{ margin: 0, fontWeight: '500' }}>{item.value}</p>
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          value={editValue}
+                          onChange={(e) => setEditValue(e.target.value)}
+                          autoFocus
+                          style={{
+                            width: '90%',
+                            padding: '4px',
+                            border: '1px solid #e0ddd7',
+                            borderRadius: '4px',
+                            fontFamily: 'inherit',
+                            fontSize: '0.85rem',
+                            background: 'transparent'
+                          }}
+                        />
+                      ) : (
+                        <p style={{ margin: 0, fontWeight: '500' }}>{item.value}</p>
+                      )}
                     </div>
-                    <button style={{ 
-                      background: 'none', 
-                      border: 'none', 
-                      color: 'var(--accent)', 
-                      fontSize: '0.75rem', 
-                      textDecoration: 'underline',
-                      cursor: 'pointer',
-                      opacity: 0.6
-                    }}>
-                      Edit
-                    </button>
+                    {!item.disableEdit && (
+                      <button 
+                        onClick={async () => {
+                          if (isEditing) {
+                            setProfileData(prev => ({ ...prev, [item.label]: editValue }));
+                            setEditingField(null);
+                            try {
+                              await profileService.updateProfile(user.uid, { [item.label]: editValue });
+                            } catch (e) {
+                              console.error("Failed to update profile", e);
+                              alert("Failed to save changes. Please try again.");
+                            }
+                          } else {
+                            setEditingField(item.label);
+                            setEditValue(item.value);
+                          }
+                        }}
+                        style={{ 
+                          background: 'none', 
+                          border: 'none', 
+                          color: 'var(--accent)', 
+                          fontSize: '0.75rem', 
+                          textDecoration: 'underline',
+                          cursor: 'pointer',
+                          opacity: 0.6,
+                          paddingTop: '15px'
+                        }}
+                      >
+                        {isEditing ? 'Save' : 'Edit'}
+                      </button>
+                    )}
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           ))}

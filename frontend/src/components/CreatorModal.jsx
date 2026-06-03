@@ -93,7 +93,7 @@ const CreatorModal = ({ isOpen, onClose }) => {
                     It can also be used by any cafe, so if you want this site to be yours, make sure to connect with me through my portfolio.
                 </p>
                 <a
-                    href="https://abhayrajrathiportfolio.netlify.app"
+                    href="https://abhayportfolio-mauve.vercel.app"
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
