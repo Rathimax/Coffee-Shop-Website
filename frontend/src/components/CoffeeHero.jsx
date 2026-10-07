@@ -92,9 +92,12 @@ const CoffeeHero = () => {
                 left: 0,
                 width: '100%',
                 height: '100%',
-                background: 'linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.8))',
+                background: 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.65) 55%, rgba(0,0,0,0.4) 80%, rgba(0,0,0,0.1) 100%)',
                 zIndex: -1
             }} />
+
+            {/* Section Blend — smooth fade from hero into the next section */}
+            <div className="hero-section-blend" />
 
             <div 
                 ref={contentRef} 
